@@ -1,0 +1,6 @@
+# ビルド関連
+*build*/
+*bin*/
+
+# clangd関連
+*cache*/
