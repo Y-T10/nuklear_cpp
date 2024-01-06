@@ -28,6 +28,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # CPMを有効にする
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM.cmake)
+# Nuklearを読み込む
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Nuklear.cmake)
 
 # CPMを用いてネット上のパッケージを取り込む
 CPMAddPackage(
