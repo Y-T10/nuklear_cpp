@@ -54,5 +54,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 # プログラムが利用するターゲットを追加
 target_link_libraries(${PROJECT_NAME} PUBLIC nuklear-header)
 
-# Add sub directories
-add_subdirectory(demo)
+if (${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
+    find_package(SDL2 REQUIRED)
+    # Add sub add_subdirectories
+    add_subdirectory(demo)
+endif()
