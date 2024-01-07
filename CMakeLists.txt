@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 # このプロジェクトの概要を設定する
-project(cpp_template
+project(Nuklear-cpp
     VERSION 0.0.1
     LANGUAGES CXX
     DESCRIPTION "Personal cpp template repository."
