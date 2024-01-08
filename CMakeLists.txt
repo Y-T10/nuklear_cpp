@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 # このプロジェクトの概要を設定する
-project(cpp_template
+project(Nuklear-cpp
     VERSION 0.0.1
     LANGUAGES CXX
     DESCRIPTION "Personal cpp template repository."
@@ -28,6 +28,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # CPMを有効にする
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM.cmake)
+# Nuklearを読み込む
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Nuklear.cmake)
 
 # CPMを用いてネット上のパッケージを取り込む
 CPMAddPackage(
@@ -40,5 +42,20 @@ CPMAddPackage(
 find_package(Threads REQUIRED)
 #find_package(Boost REQUIRED)
 
-# Add sub directories
-add_subdirectory(src)
+# ライブラリを宣言する
+add_library(${PROJECT_NAME})
+add_library("${PROJECT_NAME}::${PROJECT_NAME}" ALIAS ${PROJECT_NAME})
+
+# ソースファイルを追加
+target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/nuklear-impl.cpp)
+# ヘッダファイルのディレクトリを追加
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# プログラムが利用するターゲットを追加
+target_link_libraries(${PROJECT_NAME} PUBLIC nuklear-header)
+
+if (${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
+    find_package(SDL2 REQUIRED)
+    # Add sub add_subdirectories
+    add_subdirectory(demo)
+endif()

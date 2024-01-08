@@ -1,5 +1,6 @@
 #include "fmt/core.h"
-#include "fmt/printf.h"
+
+#include "nuklear-cpp.hpp"
 
 int main(int argc, char* argv[]) {
     fmt::println("sample program with fmt!");
