@@ -6,7 +6,9 @@
 #include <cstdint>
 #include <vector>
 
-template<class position_type = int32_t, class length_type = std::size_t, class ...wigets>
+#include "AtmWidgetConcept.hpp"
+
+template<class position_type = int32_t, class length_type = std::size_t, Widget<position_type, length_type> ...wigets>
 struct WidgetArea {
     using widget_type = std::variant<wigets...>;
     using widget_container = std::vector<widget_type>;
@@ -15,7 +17,7 @@ struct WidgetArea {
     using const_iterator = typename widget_container::const_iterator;
 
     using size_type = std::tuple<length_type, length_type>;
-    using pos_type = std::tuple<length_type, length_type>;
+    using pos_type = std::tuple<position_type, position_type>;
 
     widget_container widgets;
     size_type size;
@@ -35,12 +37,12 @@ struct WidgetArea {
     }
 
     template<class Func>
-    void resize(const size_type& s, const Func& func = Func{}) noexcept {
+    void resize_area(const size_type& s, const Func& func = Func{}) noexcept {
         static_assert(std::is_invocable_v<Func, WidgetArea&, const size_type&>);
         resize(s);
         func(*this, size);
     }
-    void resize(const size_type& s) noexcept {
+    void resize_area(const size_type& s) noexcept {
         size = s;
     }
     
@@ -53,3 +55,5 @@ struct WidgetArea {
     iterator end() noexcept { return widgets.end(); }
     const_iterator end() const noexcept { return widgets.end(); }
 };
+
+static_assert(Widget<int32_t, std::size_t, WidgetArea<>>);
