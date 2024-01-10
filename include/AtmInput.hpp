@@ -5,7 +5,9 @@
 #include <variant>
 #include "AtmWidgetArea.hpp"
 
-template<class position_type, class length_type, class ...wigets>
+#include "AtmWidgetConcept.hpp"
+
+template<class position_type, class length_type, Widget<position_type, length_type> ...wigets>
 struct WidgetAreaInput {
     using area_type = WidgetArea<position_type, length_type, wigets...>;
     using area_iterator = typename area_type::iterator;
