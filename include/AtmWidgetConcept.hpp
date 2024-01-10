@@ -15,4 +15,6 @@ concept Widget = requires(T& w) {
     { w.area_position() } -> std::same_as<const std::tuple<position_type, position_type>>;
     w.resize_area(std::tuple<length_type, length_type>{});
     w.place(std::tuple<position_type, position_type>{});
+
+    { w.under(std::tuple<position_type, position_type>{}) } -> std::same_as<bool>;
 };
