@@ -1,7 +1,7 @@
 #pragma once
 
 #include <tuple>
-#include <type_traits>
+#include <concepts>
 
 /**
  * @brief UIクラスのコンセプト
