@@ -50,6 +50,15 @@ struct WidgetArea {
         pos = p;
     }
 
+    const bool under(const pos_type& p) noexcept {
+        const auto [w, h] = size;
+        const auto [x, y] = pos;
+        const auto [p_x, p_y] = p;
+        return
+            x <= p_x && p_x <= (x + w) &&
+            y <= p_y && p_y <= (y + h);
+    }
+
     iterator begin() noexcept { return widgets.begin(); }
     const_iterator begin() const noexcept { return widgets.begin(); }
     iterator end() noexcept { return widgets.end(); }
