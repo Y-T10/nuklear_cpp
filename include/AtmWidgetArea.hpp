@@ -66,3 +66,37 @@ struct WidgetArea {
 };
 
 static_assert(Widget<int32_t, std::size_t, WidgetArea<>>);
+
+#include "AtmTypes.hpp"
+
+template<Widget2 ...wigets>
+struct WidgetArea2 {
+    using widget_type = std::variant<wigets...>;
+    using widget_container = std::vector<widget_type>;
+
+    using iterator = typename widget_container::iterator;
+    using const_iterator = typename widget_container::const_iterator;
+
+    widget_container widgets;
+    boundary_t area_boundary;
+
+    template<class T>
+    void push_back(const T& w) noexcept {
+        widgets.push_back(w);
+    };
+
+    const boundary_t boundary_area() noexcept {
+        return area_boundary;
+    }
+
+    void boundary_area(const boundary_t& b) noexcept {
+        area_boundary = b;
+    }
+
+    iterator begin() noexcept { return widgets.begin(); }
+    const_iterator begin() const noexcept { return widgets.begin(); }
+    iterator end() noexcept { return widgets.end(); }
+    const_iterator end() const noexcept { return widgets.end(); }
+};
+
+static_assert(Widget2<WidgetArea2<>>);
