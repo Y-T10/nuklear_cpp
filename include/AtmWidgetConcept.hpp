@@ -3,6 +3,8 @@
 #include <tuple>
 #include <concepts>
 
+#include "AtmTypes.hpp"
+
 /**
  * @brief UIクラスのコンセプト
  * @tparam position_type 位置座標の型
@@ -17,4 +19,10 @@ concept Widget = requires(T& w) {
     w.place(std::tuple<position_type, position_type>{});
 
     { w.under(std::tuple<position_type, position_type>{}) } -> std::same_as<bool>;
+};
+
+template<class T>
+concept Widget2 = requires(T& w) {
+    { w.boundary_area() } -> std::same_as<const boundary_t>;
+    w.boundary_area(boundary_t{});
 };
