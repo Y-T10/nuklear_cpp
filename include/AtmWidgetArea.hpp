@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <type_traits>
 #include <variant>
@@ -67,6 +68,7 @@ struct WidgetArea {
 
 static_assert(Widget<int32_t, std::size_t, WidgetArea<>>);
 
+#include "boost/geometry/algorithms/disjoint.hpp"
 #include "AtmTypes.hpp"
 
 template<Widget2 ...wigets>
@@ -92,6 +94,22 @@ struct WidgetArea2 {
     void boundary_area(const boundary_t& b) noexcept {
         area_boundary = b;
     }
+
+    iterator under(const point_t& pos) noexcept {
+        using namespace boost;
+        // posが領域外にあるかを調べる
+        if(geometry::disjoint(area_boundary, pos)) {
+            return widgets.end();
+        }
+
+        // posの下にあるUIを探す
+        return std::find_if(widgets.begin(), widgets.end(), [&pos](const widget_type& wg){
+            const boundary_t area = std::visit(wg, [](const auto& w){
+                return w.boundary_area();
+            });
+            return !geometry::disjoint(area, pos);
+        });
+    };
 
     iterator begin() noexcept { return widgets.begin(); }
     const_iterator begin() const noexcept { return widgets.begin(); }
