@@ -40,7 +40,7 @@ CPMAddPackage(
 
 # システム内のパッケージを読み込む
 find_package(Threads REQUIRED)
-#find_package(Boost REQUIRED)
+find_package(Boost 1.74.0 REQUIRED)
 
 # ライブラリを宣言する
 add_library(${PROJECT_NAME})
