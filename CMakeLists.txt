@@ -54,6 +54,15 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 # プログラムが利用するターゲットを追加
 target_link_libraries(${PROJECT_NAME} PUBLIC nuklear-header)
 
+# 自作ライブラリAtmを定義
+add_library(Atm INTERFACE)
+
+# ヘッダファイルのディレクトリを追加
+target_include_directories(Atm INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# プログラムが利用するターゲットを追加
+target_link_libraries(Atm INTERFACE Threads::Threads Boost::boost)
+
 if (${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
     find_package(SDL2 REQUIRED)
     # Add sub add_subdirectories
