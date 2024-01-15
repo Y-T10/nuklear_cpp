@@ -104,9 +104,9 @@ struct WidgetArea2 {
 
         // posの下にあるUIを探す
         return std::find_if(widgets.begin(), widgets.end(), [&pos](const widget_type& wg){
-            const boundary_t area = std::visit(wg, [](const auto& w){
+            const boundary_t area = std::visit([](const auto& w){
                 return w.boundary_area();
-            });
+            }, wg);
             return !geometry::disjoint(area, pos);
         });
     };
