@@ -1,4 +1,5 @@
 #include <type_traits>
+#include <variant>
 #include <memory>
 
 #include "fmt/core.h"
@@ -66,6 +67,29 @@ int main(int argc, char* argv[]) {
             .is_pressed = false
         }
     );
+
+    while(true) {
+        for (SDL_Event e; SDL_PollEvent(&e);) {
+            /// unipue_ptrと同様に <SDL_MOUSEBUTTONDOWN, [](const SDL_Event& e, const context_type& ctx) {}>とかけるようにする．
+            if(e.type == SDL_EventType::SDL_MOUSEBUTTONDOWN) {
+                const auto widget = sampleArea.under({e.button.x, e.button.y});
+                if(widget == sampleArea.end()){
+                    continue;
+                }
+                // visitを使う実装に変える
+                std::get<Button>(*widget).push();
+            }
+
+            if(e.type == SDL_EventType::SDL_MOUSEBUTTONUP) {
+                const auto widget = sampleArea.under({e.button.x, e.button.y});
+                if(widget == sampleArea.end()){
+                    continue;
+                }
+                // visitを使う実装に変える
+                std::get<Button>(*widget).release();
+            }
+        }
+    }
 
     return 0;
 }
