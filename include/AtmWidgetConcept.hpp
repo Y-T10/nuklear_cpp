@@ -2,6 +2,7 @@
 
 #include <tuple>
 #include <concepts>
+#include <utility>
 
 #include "AtmTypes.hpp"
 
@@ -24,5 +25,6 @@ concept Widget = requires(T& w) {
 template<class T>
 concept Widget2 = requires(T& w) {
     { w.boundary_area() } -> std::same_as<const boundary_t>;
+    { std::as_const(w).boundary_area() } -> std::same_as<const boundary_t>;
     w.boundary_area(boundary_t{});
 };
