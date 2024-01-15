@@ -2,6 +2,9 @@
 #include <memory>
 
 #include "fmt/core.h"
+#define BOOST_SCOPE_EXIT_CONFIG_USE_LAMBDAS
+#include "boost/scope_exit.hpp"
+
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_video.h"
 #include "SDL2/SDL_render.h"
@@ -34,6 +37,22 @@ namespace SDL {
 
 int main(int argc, char* argv[]) {
     fmt::println("sample program with fmt!");
+
+    SDL_Init(SDL_INIT_EVERYTHING);
+
+    BOOST_SCOPE_EXIT_ALL(){
+        SDL_Quit();
+    };
+
+    const SDL::Window window = SDL::Create<SDL::Window, SDL_CreateWindow>("demo", 0, 0, 800, 600, SDL_WindowFlags::SDL_WINDOW_FULLSCREEN_DESKTOP & SDL_WindowFlags::SDL_WINDOW_SHOWN);
+    if(window.get() == nullptr){
+        return __LINE__;
+    }
+
+    const auto renderer = SDL::Create<SDL::Renderer, SDL_CreateRenderer>(window.get(), -1, SDL_RendererFlags::SDL_RENDERER_ACCELERATED);
+    if(renderer.get() == nullptr){
+        return __LINE__;
+    }
 
     WidgetArea2<Button> sampleArea{
         .widgets = {},
