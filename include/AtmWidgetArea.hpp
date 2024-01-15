@@ -87,7 +87,7 @@ struct WidgetArea2 {
         widgets.push_back(w);
     };
 
-    const boundary_t boundary_area() noexcept {
+    const boundary_t boundary_area() const noexcept {
         return area_boundary;
     }
 

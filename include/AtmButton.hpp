@@ -9,7 +9,7 @@ struct Button {
     boundary_t button_area;
     bool is_pressed;
 
-    const boundary_t boundary_area() noexcept {
+    const boundary_t boundary_area() const noexcept {
         return button_area;
     }
 
