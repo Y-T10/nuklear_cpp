@@ -34,6 +34,31 @@ namespace SDL {
         }
         return nullptr;
     };
+
+    template <SDL_EventType event_type, class event_functor>
+    struct EventFunctor {
+        constexpr static auto type = event_type;
+        using functor = event_functor;
+    };
+
+    template<class context_type>
+    void DispatchEvent(const SDL_Event& event, context_type& ctx) {
+        return;
+    }
+
+    template<class context_type, class handler, class ...rests>
+    void DispatchEvent(SDL_Event&& event, context_type&& ctx) {
+        static_assert(std::is_invocable_v<typename handler::functor, SDL_Event&&, context_type&&>);
+        if(event.type == handler::type){
+            typename handler::functor{}(std::forward<SDL_Event>(event), std::forward<context_type>(ctx));
+            return;
+        }
+        if constexpr (sizeof...(rests) > 0) {
+            DispatchEvent<context_type, rests...>(std::forward<SDL_Event>(event), std::forward<context_type>(ctx));
+            return;
+        }
+        return;
+    }
 }
 
 int main(int argc, char* argv[]) {
