@@ -12,8 +12,7 @@ target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # プログラムが利用するターゲットを追加
 target_link_libraries(
-    demo PRIVATE fmt::fmt Threads::Threads Nuklear-cpp::Nuklear-cpp
-    Boost::boost
+    demo PRIVATE fmt::fmt Threads::Threads Nuklear-cpp::Nuklear-cpp Atm
 )
 
 add_executable(original_demo)
