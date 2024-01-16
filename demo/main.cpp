@@ -166,15 +166,22 @@ int main(int argc, char* argv[]) {
                 ButtonDown, ButtonUp, KeyDown
             >(std::forward<SDL_Event>(e), std::make_tuple(std::ref(sampleArea), std::ref(isRunning)));
         }
+
+        SDL_SetRenderDrawColor(renderer.get(), 0, 0, 100, 255);
+        SDL_RenderClear(renderer.get());
         for(const auto& widget: sampleArea) {
+            const auto& buton = std::get<SampleButton>(widget);
             // variantb likeな実装にする
-            const auto button_size = std::get<Button>(widget).boundary_area();
-
-            const SDL_FRect drawRect = {.x = float(button_size.min_corner().x()), .y = float(button_size.min_corner().x())};
-            SDL_RenderFillRectF(renderer.get(), &drawRect);
-
-            SDL_RenderPresent(renderer.get());
+            // getの値を受け取るとまずい
+            if(buton.pressed()) {
+                SDL_SetRenderDrawColor(renderer.get(), 200, 200, 0, 255);
+            } else {
+                SDL_SetRenderDrawColor(renderer.get(), 0, 100, 100, 255);
+            }
+            const SDL_Rect drawRect = Boundary2Rect(buton.boundary_area());
+            SDL_RenderFillRect(renderer.get(), &drawRect);
         }
+        SDL_RenderPresent(renderer.get());
         SDL_Delay(1);
     }
 
