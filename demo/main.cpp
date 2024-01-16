@@ -166,8 +166,18 @@ int main(int argc, char* argv[]) {
                 ButtonDown, ButtonUp, KeyDown
             >(std::forward<SDL_Event>(e), std::make_tuple(std::ref(sampleArea), std::ref(isRunning)));
         }
+        for(const auto& widget: sampleArea) {
+            // variantb likeな実装にする
+            const auto button_size = std::get<Button>(widget).boundary_area();
+
+            const SDL_FRect drawRect = {.x = float(button_size.min_corner().x()), .y = float(button_size.min_corner().x())};
+            SDL_RenderFillRectF(renderer.get(), &drawRect);
+
+            SDL_RenderPresent(renderer.get());
+        }
         SDL_Delay(1);
     }
+
 
     return 0;
 }
