@@ -4,7 +4,9 @@
 #include "boost/geometry/geometries/box.hpp"
 
 /// 平面座標上の点
-using point_t = typename boost::geometry::model::d2::point_xy<double>;
+template<class T>
+using point_t = typename boost::geometry::model::d2::point_xy<T>;
 
 /// UIの境界領域
-using boundary_t = typename boost::geometry::model::box<point_t>;
+template<class T, class point_type = point_t<T>>
+using boundary_t = typename boost::geometry::model::box<point_type>;
