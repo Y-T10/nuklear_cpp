@@ -19,6 +19,7 @@
 #include "SDL2/SDL_surface.h"
 #include "SDL2/SDL_pixels.h"
 #include "SDL_ttf.h"
+#include "SDL_rect.h"
 
 #include "AtmWidgetArea.hpp"
 #include "AtmButton.hpp"
@@ -93,6 +94,15 @@ namespace SDL::TTF {
     const Surface WriteText(const Font& font, const std::string& text, const SDL_Color& fg, const SDL_Color& bg) noexcept {
         return Surface(TTF_RenderUTF8_LCD(font.get(), text.c_str(), fg, bg));
     }
+}
+
+template <class T>
+const SDL_Rect Boundary2Rect(const boundary_t<T>& box) noexcept {
+    return SDL_Rect{
+        .x = box.min_corner().x(), .y = box.min_corner().x(),
+        .w = box.max_corner().x() - box.min_corner().x(),
+        .h = box.max_corner().y() - box.min_corner().y(),
+    };
 }
 
 int main(int argc, char* argv[]) {
