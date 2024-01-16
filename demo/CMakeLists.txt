@@ -15,6 +15,7 @@ target_link_libraries(
     demo PRIVATE fmt::fmt Threads::Threads Nuklear-cpp::Nuklear-cpp Atm
     $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
     $<IF:$<BOOL:${BUILD_SHARED_LIBS}>,SDL2::SDL2,SDL2::SDL2-static>
+    SDL2_ttf::SDL2_ttf
 )
 
 add_executable(original_demo)
