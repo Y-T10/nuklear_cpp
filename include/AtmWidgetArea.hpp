@@ -81,12 +81,12 @@ struct WidgetArea2 {
 
     using boundary_type = boundary_t<coord_type>;
 
-    widget_container widgets;
+    widget_container widget_array;
     boundary_type area_boundary;
 
-    template<class T>
-    void push_back(const T& w) noexcept {
-        widgets.push_back(w);
+    template<class widget_t>
+    void push_back(const widget_t& w) noexcept {
+        widget_array.push_back(w);
     };
 
     const boundary_type boundary_area() const noexcept {
@@ -101,11 +101,11 @@ struct WidgetArea2 {
         using namespace boost;
         // posが領域外にあるかを調べる
         if(geometry::disjoint(area_boundary, pos)) {
-            return widgets.end();
+            return widget_array.end();
         }
 
         // posの下にあるUIを探す
-        return std::find_if(widgets.begin(), widgets.end(), [&pos](const widget_type& wg){
+        return std::find_if(widget_array.begin(), widget_array.end(), [&pos](const widget_type& wg){
             const boundary_t<coord_type> area = std::visit([](const auto& w){
                 return w.boundary_area();
             }, wg);
@@ -113,10 +113,10 @@ struct WidgetArea2 {
         });
     };
 
-    iterator begin() noexcept { return widgets.begin(); }
-    const_iterator begin() const noexcept { return widgets.begin(); }
-    iterator end() noexcept { return widgets.end(); }
-    const_iterator end() const noexcept { return widgets.end(); }
+    iterator begin() noexcept { return widget_array.begin(); }
+    const_iterator begin() const noexcept { return widget_array.begin(); }
+    iterator end() noexcept { return widget_array.end(); }
+    const_iterator end() const noexcept { return widget_array.end(); }
 };
 
 static_assert(Widget2<WidgetArea2<int>, int>);
