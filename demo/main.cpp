@@ -3,6 +3,8 @@
 #include <utility>
 #include <variant>
 #include <memory>
+#include <optional>
+#include <string>
 
 #include "fmt/core.h"
 #define BOOST_SCOPE_EXIT_CONFIG_USE_LAMBDAS
@@ -14,6 +16,9 @@
 #include "SDL2/SDL_timer.h"
 #include "SDL2/SDL_scancode.h"
 #include "SDL_events.h"
+#include "SDL2/SDL_surface.h"
+#include "SDL2/SDL_pixels.h"
+#include "SDL_ttf.h"
 
 #include "AtmWidgetArea.hpp"
 #include "AtmButton.hpp"
