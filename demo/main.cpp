@@ -121,38 +121,41 @@ int main(int argc, char* argv[]) {
         return __LINE__;
     }
 
-    WidgetArea2<Button> sampleArea{
-        .widgets = {},
-        .area_boundary = boundary_t{point_t{0,0},point_t{800,600}}
+    using SampleButton = Button<int>;
+    using SampleArea = WidgetArea2<int, SampleButton>;
+
+    SampleArea sampleArea{
+        .widget_array = {},
+        .area_boundary = boundary_t<int>{point_t<int>{0,0},point_t<int>{800,600}}
     };
 
-    sampleArea.push_back(
-        Button{
+    sampleArea.emplace_back(
+        SampleButton{
             .text = "hello",
-            .button_area = boundary_t{point_t{10, 10}, point_t{110, 30}},
+            .button_area = boundary_t<int>{point_t<int>{10,10},point_t<int>{110,30}},
             .is_pressed = false
         }
     );
 
-    using ctx_type = std::tuple<decltype(sampleArea)&, bool&>;
+    using ctx_type = std::tuple<SampleArea &, bool &>;
     using ButtonDown = SDL::EventFunctor<SDL_MOUSEBUTTONDOWN, decltype([](SDL_Event&& e, ctx_type&& ctx){
-            auto sampleArea = std::get<WidgetArea2<Button>&>(ctx);
-            const auto widget = sampleArea.under({e.button.x, e.button.y});
-            std::get<bool&>(ctx) = false;
-            if(widget == sampleArea.end()){
+            auto widget = std::get<SampleArea&>(ctx).under<int>({e.button.x, e.button.y});
+            if(widget == std::get<SampleArea&>(ctx).end()){
                 return;
             }
             // visitを使う実装に変える
-            std::get<Button>(*widget).push();
+            auto& button = std::get<SampleButton>(*widget);
+            button.push();
         })>;
     using ButtonUp = SDL::EventFunctor<SDL_MOUSEBUTTONUP, decltype([](SDL_Event&& e, ctx_type&& ctx){
-            auto sampleArea = std::get<WidgetArea2<Button>&>(ctx);
-            const auto widget = sampleArea.under({e.button.x, e.button.y});
+            SampleArea& sampleArea = std::get<SampleArea&>(ctx);
+            auto widget = sampleArea.under<int>({e.button.x, e.button.y});
             if(widget == sampleArea.end()){
                 return;
             }
             // visitを使う実装に変える
-            std::get<Button>(*widget).release();
+            auto& button = std::get<SampleButton>(*widget);
+            button.release();
         })>;
     using KeyDown = SDL::EventFunctor<SDL_KEYDOWN, decltype([](SDL_Event&& e, ctx_type&& ctx){
             if(e.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
@@ -164,7 +167,7 @@ int main(int argc, char* argv[]) {
         for (SDL_Event e; SDL_PollEvent(&e);) {
             SDL::DispatchEvent<ctx_type,
                 ButtonDown, ButtonUp, KeyDown
-            >(std::forward<SDL_Event>(e), std::make_tuple(std::ref(sampleArea), std::ref(isRunning)));
+            >(std::forward<SDL_Event>(e), std::tie(sampleArea, isRunning));
         }
 
         SDL_SetRenderDrawColor(renderer.get(), 0, 0, 100, 255);
