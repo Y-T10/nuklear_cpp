@@ -37,6 +37,11 @@ CPMAddPackage(
     GITHUB_REPOSITORY fmtlib/fmt
     GIT_TAG 10.2.1
 )
+CPMAddPackage(
+    NAME SDL2_ttf
+    GITHUB_REPOSITORY libsdl-org/SDL_ttf
+    GIT_TAG release-2.20.2
+)
 
 # システム内のパッケージを読み込む
 find_package(Threads REQUIRED)
