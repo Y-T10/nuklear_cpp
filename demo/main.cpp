@@ -99,8 +99,10 @@ int main(int argc, char* argv[]) {
     fmt::println("sample program with fmt!");
 
     SDL_Init(SDL_INIT_EVERYTHING);
+    TTF_Init();
 
     BOOST_SCOPE_EXIT_ALL(){
+        TTF_Quit();
         SDL_Quit();
     };
 
@@ -111,6 +113,11 @@ int main(int argc, char* argv[]) {
 
     const auto renderer = SDL::Create<SDL::Renderer, SDL_CreateRenderer>(window.get(), -1, SDL_RendererFlags::SDL_RENDERER_ACCELERATED);
     if(renderer.get() == nullptr){
+        return __LINE__;
+    }
+
+    const SDL::TTF::Font JPFont = SDL::TTF::OpenFont("/usr/share/fonts/opentype/ipafont-mincho/ipam.ttf");
+    if(JPFont.get() == nullptr) {
         return __LINE__;
     }
 
