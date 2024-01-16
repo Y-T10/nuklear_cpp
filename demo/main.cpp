@@ -63,6 +63,8 @@ namespace SDL {
         }
         return;
     }
+
+    using Surface = SDL_ptr<SDL_Surface, SDL_FreeSurface>;
 }
 
 int main(int argc, char* argv[]) {
