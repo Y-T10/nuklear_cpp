@@ -6,6 +6,7 @@
 #include <variant>
 #include <cstdint>
 #include <vector>
+#include <utility>
 
 #include "AtmWidgetConcept.hpp"
 
@@ -87,6 +88,11 @@ struct WidgetArea2 {
     template<class widget_t>
     void push_back(const widget_t& w) noexcept {
         widget_array.push_back(w);
+    };
+
+    template<class widget_t>
+    void emplace_back(widget_t&& w) noexcept {
+        widget_array.emplace_back(std::forward<widget_t>(w));
     };
 
     const boundary_type boundary_area() const noexcept {
