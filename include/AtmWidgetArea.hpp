@@ -71,7 +71,7 @@ static_assert(Widget<int32_t, std::size_t, WidgetArea<>>);
 #include "boost/geometry/algorithms/disjoint.hpp"
 #include "AtmTypes.hpp"
 
-template<Widget2 ...wigets>
+template<class coord_type, Widget2<coord_type> ...wigets>
 struct WidgetArea2 {
     using widget_type = std::variant<wigets...>;
     using widget_container = std::vector<widget_type>;
@@ -79,19 +79,21 @@ struct WidgetArea2 {
     using iterator = typename widget_container::iterator;
     using const_iterator = typename widget_container::const_iterator;
 
+    using boundary_type = boundary_t<coord_type>;
+
     widget_container widgets;
-    boundary_t area_boundary;
+    boundary_type area_boundary;
 
     template<class T>
     void push_back(const T& w) noexcept {
         widgets.push_back(w);
     };
 
-    const boundary_t boundary_area() const noexcept {
+    const boundary_type boundary_area() const noexcept {
         return area_boundary;
     }
 
-    void boundary_area(const boundary_t& b) noexcept {
+    void boundary_area(const boundary_type& b) noexcept {
         area_boundary = b;
     }
 
@@ -104,7 +106,7 @@ struct WidgetArea2 {
 
         // posの下にあるUIを探す
         return std::find_if(widgets.begin(), widgets.end(), [&pos](const widget_type& wg){
-            const boundary_t area = std::visit([](const auto& w){
+            const boundary_t<coord_type> area = std::visit([](const auto& w){
                 return w.boundary_area();
             }, wg);
             return !geometry::disjoint(area, pos);
@@ -117,4 +119,4 @@ struct WidgetArea2 {
     const_iterator end() const noexcept { return widgets.end(); }
 };
 
-static_assert(Widget2<WidgetArea2<>>);
+static_assert(Widget2<WidgetArea2<int>, int>);
