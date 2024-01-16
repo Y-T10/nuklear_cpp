@@ -71,9 +71,9 @@ static_assert(Widget<int32_t, std::size_t, WidgetArea<>>);
 #include "boost/geometry/algorithms/disjoint.hpp"
 #include "AtmTypes.hpp"
 
-template<class coord_type, Widget2<coord_type> ...wigets>
+template<class coord_type, Widget2<coord_type> ...widgets>
 struct WidgetArea2 {
-    using widget_type = std::variant<wigets...>;
+    using widget_type = std::variant<widgets...>;
     using widget_container = std::vector<widget_type>;
 
     using iterator = typename widget_container::iterator;
