@@ -30,3 +30,5 @@ struct Button {
         is_pressed = false;
     }
 };
+
+static_assert(Widget2<Button<int>, int>);
