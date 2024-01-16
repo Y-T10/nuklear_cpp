@@ -97,7 +97,8 @@ struct WidgetArea2 {
         area_boundary = b;
     }
 
-    iterator under(const point_t& pos) noexcept {
+    template <class T>
+    iterator under(const point_t<T>& pos) noexcept {
         using namespace boost;
         // posが領域外にあるかを調べる
         if(geometry::disjoint(area_boundary, pos)) {
