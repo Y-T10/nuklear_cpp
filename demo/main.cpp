@@ -124,13 +124,17 @@ using render_context = std::tuple<const SDL::Renderer&, const SDL::TTF::Font&>;
 
 template<class T>
 void DrawButton(const render_context& ctx, const Button<T>& button) noexcept {
-    if(button.pressed()) {
-        SDL_SetRenderDrawColor(renderer.get(), 200, 200, 0, 255);
-    } else {
-        SDL_SetRenderDrawColor(renderer.get(), 0, 100, 100, 255);
-    }
+    auto& [renderer, font] = ctx;
+    const SDL_Color bg = button.pressed()?
+        SDL_Color{.r = 200, .g = 200, .b = 0, .a = 255}:
+        SDL_Color{.r = 0, .g = 100, .b = 100, .a = 255};
+    SDL_SetRenderDrawColor(renderer.get(), bg.r, bg.g, bg.b, bg.a);
     const SDL_Rect drawRect = Boundary2Rect(button.boundary_area());
     SDL_RenderFillRect(renderer.get(), &drawRect);
+    const auto text_image = WriteText(
+        font, button.text, SDL_Color{.r = 0, .g = 0, .b = 0, .a =255}, bg
+    );
+    SDL::RenderSurface(renderer, text_image, drawRect.x + 5, drawRect.y + 5);
 };
 
 int main(int argc, char* argv[]) {
