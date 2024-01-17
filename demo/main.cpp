@@ -165,10 +165,14 @@ int main(int argc, char* argv[]) {
 
     using SampleButton = Button<int>;
     using SampleArea = WidgetArea2<int, SampleButton>;
-
+    int win_width = 0, win_height = 0;
+    SDL_GetWindowSize(window.get(), &win_width, &win_height);
     SampleArea sampleArea{
         .widget_array = {},
-        .area_boundary = boundary_t<int>{point_t<int>{0,0},point_t<int>{800,600}}
+        .area_boundary = boundary_t<int>{
+            point_t<int>{0,0},
+            point_t<int>{win_width,win_height}
+        }
     };
 
     sampleArea.emplace_back(
