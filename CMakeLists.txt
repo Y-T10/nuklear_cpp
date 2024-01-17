@@ -71,6 +71,11 @@ target_link_libraries(Atm INTERFACE Threads::Threads Boost::boost)
 if (${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
     find_package(SDL2 REQUIRED)
     find_package(Fontconfig REQUIRED)
+    CPMAddPackage(
+        NAME SDL2_gfx
+        GITHUB_REPOSITORY Y-T10/SDL_gfx_cmake
+        GIT_TAG master
+    )
     # Add sub add_subdirectories
     add_subdirectory(demo)
 endif()
