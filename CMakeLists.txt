@@ -72,7 +72,7 @@ if (${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
     find_package(SDL2 REQUIRED)
     find_package(Fontconfig REQUIRED)
     CPMAddPackage(
-        NAME SDL2_gfx
+        NAME SDL_gfx
         GITHUB_REPOSITORY Y-T10/SDL_gfx_cmake
         GIT_TAG master
     )
