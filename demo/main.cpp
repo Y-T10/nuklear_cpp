@@ -99,7 +99,7 @@ namespace SDL::TTF {
 template <class T>
 const SDL_Rect Boundary2Rect(const boundary_t<T>& box) noexcept {
     return SDL_Rect{
-        .x = box.min_corner().x(), .y = box.min_corner().x(),
+        .x = box.min_corner().x(), .y = box.min_corner().y(),
         .w = box.max_corner().x() - box.min_corner().x(),
         .h = box.max_corner().y() - box.min_corner().y(),
     };
