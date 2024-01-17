@@ -153,9 +153,12 @@ int main(int argc, char* argv[]) {
             if(widget == std::get<SampleArea&>(ctx).end()){
                 return;
             }
-            // visitを使う実装に変える
-            auto& button = std::get<SampleButton>(*widget);
-            button.push();
+            std::visit(decltype([]<class T>(T& w) {
+                if constexpr (std::is_same_v<T, SampleButton>) {
+                    w.push();
+                    return;
+                }
+            }){}, *widget);
         })>;
     using ButtonUp = SDL::EventFunctor<SDL_MOUSEBUTTONUP, decltype([](SDL_Event&& e, ctx_type&& ctx){
             SampleArea& sampleArea = std::get<SampleArea&>(ctx);
@@ -163,9 +166,12 @@ int main(int argc, char* argv[]) {
             if(widget == sampleArea.end()){
                 return;
             }
-            // visitを使う実装に変える
-            auto& button = std::get<SampleButton>(*widget);
-            button.release();
+            std::visit(decltype([]<class T>(T& w) {
+                if constexpr (std::is_same_v<T, SampleButton>) {
+                    w.release();
+                    return;
+                }
+            }){}, *widget);
         })>;
     using KeyDown = SDL::EventFunctor<SDL_KEYDOWN, decltype([](SDL_Event&& e, ctx_type&& ctx){
             if(e.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
@@ -183,16 +189,19 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer.get(), 0, 0, 100, 255);
         SDL_RenderClear(renderer.get());
         for(const auto& widget: sampleArea) {
-            const auto& buton = std::get<SampleButton>(widget);
-            // variantb likeな実装にする
-            // getの値を受け取るとまずい
-            if(buton.pressed()) {
-                SDL_SetRenderDrawColor(renderer.get(), 200, 200, 0, 255);
-            } else {
-                SDL_SetRenderDrawColor(renderer.get(), 0, 100, 100, 255);
-            }
-            const SDL_Rect drawRect = Boundary2Rect(buton.boundary_area());
-            SDL_RenderFillRect(renderer.get(), &drawRect);
+            std::visit([&renderer]<class T>(const T& w) {
+                if constexpr (std::is_same_v<T, SampleButton>) {
+                    const SampleButton& button = w;
+                    if(button.pressed()) {
+                        SDL_SetRenderDrawColor(renderer.get(), 200, 200, 0, 255);
+                    } else {
+                        SDL_SetRenderDrawColor(renderer.get(), 0, 100, 100, 255);
+                    }
+                    const SDL_Rect drawRect = Boundary2Rect(button.boundary_area());
+                    SDL_RenderFillRect(renderer.get(), &drawRect);
+                    return;
+                }
+            }, widget);
         }
         SDL_RenderPresent(renderer.get());
         SDL_Delay(1);
