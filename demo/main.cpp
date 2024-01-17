@@ -105,6 +105,17 @@ const SDL_Rect Boundary2Rect(const boundary_t<T>& box) noexcept {
     };
 }
 
+template<class T>
+void DrawButton(const SDL::Renderer& renderer, const Button<T>& button) noexcept {
+    if(button.pressed()) {
+        SDL_SetRenderDrawColor(renderer.get(), 200, 200, 0, 255);
+    } else {
+        SDL_SetRenderDrawColor(renderer.get(), 0, 100, 100, 255);
+    }
+    const SDL_Rect drawRect = Boundary2Rect(button.boundary_area());
+    SDL_RenderFillRect(renderer.get(), &drawRect);
+};
+
 int main(int argc, char* argv[]) {
     fmt::println("sample program with fmt!");
 
@@ -191,14 +202,7 @@ int main(int argc, char* argv[]) {
         for(const auto& widget: sampleArea) {
             std::visit([&renderer]<class T>(const T& w) {
                 if constexpr (std::is_same_v<T, SampleButton>) {
-                    const SampleButton& button = w;
-                    if(button.pressed()) {
-                        SDL_SetRenderDrawColor(renderer.get(), 200, 200, 0, 255);
-                    } else {
-                        SDL_SetRenderDrawColor(renderer.get(), 0, 100, 100, 255);
-                    }
-                    const SDL_Rect drawRect = Boundary2Rect(button.boundary_area());
-                    SDL_RenderFillRect(renderer.get(), &drawRect);
+                    DrawButton(renderer, w);
                     return;
                 }
             }, widget);
