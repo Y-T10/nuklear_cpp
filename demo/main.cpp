@@ -71,6 +71,21 @@ namespace SDL {
     }
 
     using Surface = SDL_ptr<SDL_Surface, SDL_FreeSurface>;
+    using Texture = SDL_ptr<SDL_Texture, SDL_DestroyTexture>;
+
+    void RenderSurface(const Renderer& renderer, const Surface& surface, const int x, const int y) noexcept {
+        assert(!!renderer.get());
+        if(surface.get() == nullptr) {
+            return;
+        }
+        const auto texture = Texture(SDL_CreateTextureFromSurface(renderer.get(), surface.get()));
+        if(texture.get() == nullptr) {
+            return;
+        }
+        const SDL_Rect src_area = {.x = 0, .y = 0, .w = surface->w, .h = surface->h};
+        const SDL_Rect dst_area = {.x = x, .y = y, .w = surface->w, .h = surface->h};
+        SDL_RenderCopy(renderer.get(), texture.get(), &src_area, &dst_area);
+    }
 }
 
 namespace SDL::TTF {
