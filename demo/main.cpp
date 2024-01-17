@@ -120,8 +120,10 @@ const SDL_Rect Boundary2Rect(const boundary_t<T>& box) noexcept {
     };
 }
 
+using render_context = std::tuple<const SDL::Renderer&, const SDL::TTF::Font&>;
+
 template<class T>
-void DrawButton(const SDL::Renderer& renderer, const Button<T>& button) noexcept {
+void DrawButton(const render_context& ctx, const Button<T>& button) noexcept {
     if(button.pressed()) {
         SDL_SetRenderDrawColor(renderer.get(), 200, 200, 0, 255);
     } else {
@@ -215,9 +217,9 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer.get(), 0, 0, 100, 255);
         SDL_RenderClear(renderer.get());
         for(const auto& widget: sampleArea) {
-            std::visit([&renderer]<class T>(const T& w) {
+            std::visit([&renderer, &JPFont]<class T>(const T& w) {
                 if constexpr (std::is_same_v<T, SampleButton>) {
-                    DrawButton(renderer, w);
+                    DrawButton(std::tie(renderer, JPFont), w);
                     return;
                 }
             }, widget);
