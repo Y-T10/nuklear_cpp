@@ -86,6 +86,21 @@ namespace SDL {
         const SDL_Rect dst_area = {.x = x, .y = y, .w = surface->w, .h = surface->h};
         SDL_RenderCopy(renderer.get(), texture.get(), &src_area, &dst_area);
     }
+
+    const std::optional<std::pair<float,float>> FitRenderOutput(const Renderer& renderer, const Window& window) {
+        int render_w = 0, render_h = 0;
+        int window_w = 0, window_h = 0;
+        SDL_GetWindowSize(window.get(), &window_w, &window_h);
+        if(SDL_GetRendererOutputSize(renderer.get(), &render_w, &render_h) < 0) {
+            return std::nullopt;
+        }
+        const float scale_x = (double)(render_w) / (double)(window_w);
+        const float scale_y = (double)(render_h) / (double)(window_h);
+        return 
+            SDL_RenderSetScale(renderer.get(), scale_x, scale_y) == 0?
+            std::make_optional(std::pair<float, float>{scale_x, scale_y}):
+            std::nullopt;
+    }
 }
 
 namespace SDL::TTF {
@@ -158,7 +173,12 @@ int main(int argc, char* argv[]) {
         return __LINE__;
     }
 
-    const SDL::TTF::Font JPFont = SDL::TTF::OpenFont("/usr/share/fonts/opentype/ipafont-mincho/ipam.ttf");
+    const auto scale = FitRenderOutput(renderer, window);
+    if(!scale) {
+        return __LINE__;
+    }
+
+    const SDL::TTF::Font JPFont = SDL::TTF::OpenFont("/usr/share/fonts/opentype/ipafont-mincho/ipam.ttf", 18);
     if(JPFont.get() == nullptr) {
         return __LINE__;
     }
