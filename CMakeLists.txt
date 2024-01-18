@@ -28,8 +28,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # CPMを有効にする
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM.cmake)
-# Nuklearを読み込む
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Nuklear.cmake)
 
 # CPMを用いてネット上のパッケージを取り込む
 CPMAddPackage(
@@ -46,18 +44,6 @@ CPMAddPackage(
 # システム内のパッケージを読み込む
 find_package(Threads REQUIRED)
 find_package(Boost 1.74.0 REQUIRED)
-
-# ライブラリを宣言する
-add_library(${PROJECT_NAME})
-add_library("${PROJECT_NAME}::${PROJECT_NAME}" ALIAS ${PROJECT_NAME})
-
-# ソースファイルを追加
-target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/nuklear-impl.cpp)
-# ヘッダファイルのディレクトリを追加
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-# プログラムが利用するターゲットを追加
-target_link_libraries(${PROJECT_NAME} PUBLIC nuklear-header)
 
 # 自作ライブラリAtmを定義
 add_library(Atm INTERFACE)
