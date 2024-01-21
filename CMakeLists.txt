@@ -59,4 +59,5 @@ if (${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
     find_package(Fontconfig REQUIRED)
     # Add sub add_subdirectories
     add_subdirectory(demo)
+    add_subdirectory(SDL2Cpp)
 endif()
