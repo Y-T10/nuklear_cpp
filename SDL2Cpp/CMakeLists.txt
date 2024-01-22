@@ -4,6 +4,7 @@ add_library(SDL2Cpp)
 target_sources(
     SDL2Cpp PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SDLCpp_video.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/SDLCpp_ttf.cpp
 )
 
 # ヘッダファイルのディレクトリを追加
@@ -15,7 +16,6 @@ target_include_directories(
 # プログラムが利用するターゲットを追加
 target_link_libraries(
     SDL2Cpp PUBLIC
-    $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
     $<IF:$<BOOL:${BUILD_SHARED_LIBS}>,SDL2::SDL2,SDL2::SDL2-static>
-    SDL2_ttf::SDL2_ttf
+    $<IF:$<BOOL:${BUILD_SHARED_LIBS}>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static>
 )
