@@ -1,6 +1,8 @@
 #pragma once
 
 #include <optional>
+#include <type_traits>
+#include <utility>
 #include <memory>
 
 #include "SDL2/SDL_render.h"
@@ -8,8 +10,15 @@
 #include "SDL2/SDL_video.h"
 
 namespace SDL2Cpp {
+    template<class T, void(*deleter)(T*)>
+    struct SDL_deleter {
+        void operator()(T* ptr) {
+            deleter(ptr);
+        };
+    };
+
     template<class T, auto deleter>
-    using SDL_ptr = std::unique_ptr<T, decltype([](T* ptr){deleter(ptr);})>;
+    using SDL_ptr = std::unique_ptr<T, SDL_deleter<T, deleter>>;
 
     using Window = SDL_ptr<SDL_Window, SDL_DestroyWindow>;
     using Renderer = SDL_ptr<SDL_Renderer, SDL_DestroyRenderer>;
