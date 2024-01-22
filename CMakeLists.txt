@@ -7,6 +7,8 @@ project(Nuklear-cpp
     DESCRIPTION "Personal cpp template repository."
 )
 
+set(CMAKE_BUILD_TYPE Debug)
+
 # CMakeのポリシーを設定する
 cmake_policy(SET CMP0076 NEW)
 cmake_policy(SET CMP0128 NEW)
@@ -17,11 +19,10 @@ cmake_policy(SET CMP0077 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 # C++コンパイラに渡すオプションを設定する
-add_compile_options(-Wall $<$<CONFIG:Debug>:-g3>)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_BUILD_TYPE Release)
+add_compile_options(-Wall $<$<CONFIG:Debug>:-g3>)
 
 # clangd向けの設定ファイルを生成させる
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
