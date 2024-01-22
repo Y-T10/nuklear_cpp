@@ -1,14 +1,9 @@
-#include <type_traits>
-#include <tuple>
-#include <utility>
-#include <variant>
-#include <memory>
-#include <optional>
-#include <string>
-
 #include "fmt/core.h"
 #define BOOST_SCOPE_EXIT_CONFIG_USE_LAMBDAS
 #include "boost/scope_exit.hpp"
+
+#include "SDLCpp.hpp"
+#include "SDLCpp_ttf.hpp"
 
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_video.h"
@@ -25,107 +20,6 @@
 #include "AtmButton.hpp"
 #include "AtmTypes.hpp"
 
-namespace SDL {
-    template<class T, auto deleter>
-    using SDL_ptr = std::unique_ptr<T, decltype([](T* ptr){deleter(ptr);})>;
-
-    using Window = SDL_ptr<SDL_Window, SDL_DestroyWindow>;
-    using Renderer = SDL_ptr<SDL_Renderer, SDL_DestroyRenderer>;
-
-    /// 元関数と同じ引数を受け取れるようにする
-    /// boost のargument typeを使うと良さそう
-    template<class ptr_type, auto Func, class ...Args>
-    const ptr_type Create(Args&& ...args) noexcept {
-        /// static_assterのみがエラーとなるようにするため、評価結果の変数を用意した．
-        constexpr bool chechFunc = std::is_invocable_r_v<typename ptr_type::pointer, decltype(Func), Args...>;
-        static_assert(chechFunc, "Func or ptr_type is wrong.");
-        if constexpr (chechFunc) {
-            return ptr_type(Func(args...));
-        }
-        return nullptr;
-    };
-
-    template <SDL_EventType event_type, class event_functor>
-    struct EventFunctor {
-        constexpr static auto type = event_type;
-        using functor = event_functor;
-    };
-
-    template<class context_type>
-    void DispatchEvent(const SDL_Event& event, context_type& ctx) {
-        return;
-    }
-
-    template<class context_type, class handler, class ...rests>
-    void DispatchEvent(SDL_Event&& event, context_type&& ctx) {
-        static_assert(std::is_invocable_v<typename handler::functor, SDL_Event&&, context_type&&>);
-        if(event.type == handler::type){
-            typename handler::functor{}(std::forward<SDL_Event>(event), std::forward<context_type>(ctx));
-            return;
-        }
-        if constexpr (sizeof...(rests) > 0) {
-            DispatchEvent<context_type, rests...>(std::forward<SDL_Event>(event), std::forward<context_type>(ctx));
-            return;
-        }
-        return;
-    }
-
-    using Surface = SDL_ptr<SDL_Surface, SDL_FreeSurface>;
-    using Texture = SDL_ptr<SDL_Texture, SDL_DestroyTexture>;
-
-    void RenderSurface(const Renderer& renderer, const Surface& surface, const int x, const int y) noexcept {
-        assert(!!renderer.get());
-        if(surface.get() == nullptr) {
-            return;
-        }
-        const auto texture = Texture(SDL_CreateTextureFromSurface(renderer.get(), surface.get()));
-        if(texture.get() == nullptr) {
-            return;
-        }
-        const SDL_Rect src_area = {.x = 0, .y = 0, .w = surface->w, .h = surface->h};
-        const SDL_Rect dst_area = {.x = x, .y = y, .w = surface->w, .h = surface->h};
-        SDL_RenderCopy(renderer.get(), texture.get(), &src_area, &dst_area);
-    }
-
-    const std::optional<std::pair<float,float>> FitRenderOutput(const Renderer& renderer, const Window& window) {
-        int render_w = 0, render_h = 0;
-        int window_w = 0, window_h = 0;
-        SDL_GetWindowSize(window.get(), &window_w, &window_h);
-        if(SDL_GetRendererOutputSize(renderer.get(), &render_w, &render_h) < 0) {
-            return std::nullopt;
-        }
-        const float scale_x = (double)(render_w) / (double)(window_w);
-        const float scale_y = (double)(render_h) / (double)(window_h);
-        return 
-            SDL_RenderSetScale(renderer.get(), scale_x, scale_y) == 0?
-            std::make_optional(std::pair<float, float>{scale_x, scale_y}):
-            std::nullopt;
-    }
-}
-
-namespace SDL::TTF {
-    using Font = std::unique_ptr<TTF_Font, decltype([](TTF_Font* ptr){TTF_CloseFont(ptr);})>;
-
-    const Font OpenFont(const std::string& file, int point_size = 12) noexcept {
-        return Font(TTF_OpenFont(file.c_str(), point_size));
-    }
-
-    const std::optional<std::pair<int, int>> UTF8TextSize(const Font& font, const std::string text) noexcept {
-        if(!font.get()) {
-            return std::nullopt;
-        }
-        int w = 0, h = 0;
-        if(TTF_SizeUTF8(font.get(), text.c_str(), &w, &h) == 0) {
-            return std::make_optional(std::make_pair(w, h));
-        }
-        return std::nullopt;
-    }
-
-    const Surface WriteText(const Font& font, const std::string& text, const SDL_Color& fg, const SDL_Color& bg) noexcept {
-        return Surface(TTF_RenderUTF8_LCD(font.get(), text.c_str(), fg, bg));
-    }
-}
-
 template <class T>
 const SDL_Rect Boundary2Rect(const boundary_t<T>& box) noexcept {
     return SDL_Rect{
@@ -135,7 +29,10 @@ const SDL_Rect Boundary2Rect(const boundary_t<T>& box) noexcept {
     };
 }
 
-using render_context = std::tuple<const SDL::Renderer&, const SDL::TTF::Font&>;
+using namespace SDL2Cpp;
+using namespace SDL2Cpp::TTF;
+
+using render_context = std::tuple<const Renderer&, const Font&>;
 
 template<class T>
 void DrawButton(const render_context& ctx, const Button<T>& button) noexcept {
@@ -149,7 +46,7 @@ void DrawButton(const render_context& ctx, const Button<T>& button) noexcept {
     const auto text_image = WriteText(
         font, button.text, SDL_Color{.r = 0, .g = 0, .b = 0, .a =255}, bg
     );
-    SDL::RenderSurface(renderer, text_image, drawRect.x + 5, drawRect.y + 5);
+    RenderSurface(renderer, text_image, drawRect.x + 5, drawRect.y + 5);
 };
 
 int main(int argc, char* argv[]) {
@@ -163,12 +60,12 @@ int main(int argc, char* argv[]) {
         SDL_Quit();
     };
 
-    const SDL::Window window = SDL::Create<SDL::Window, SDL_CreateWindow>("demo", 0, 0, 800, 600, SDL_WindowFlags::SDL_WINDOW_FULLSCREEN_DESKTOP);
+    const Window window = Create<Window, SDL_CreateWindow>("demo", 0, 0, 800, 600, SDL_WindowFlags::SDL_WINDOW_FULLSCREEN_DESKTOP);
     if(window.get() == nullptr){
         return __LINE__;
     }
 
-    const auto renderer = SDL::Create<SDL::Renderer, SDL_CreateRenderer>(window.get(), -1, SDL_RendererFlags::SDL_RENDERER_ACCELERATED);
+    const auto renderer = Create<Renderer, SDL_CreateRenderer>(window.get(), -1, SDL_RendererFlags::SDL_RENDERER_ACCELERATED);
     if(renderer.get() == nullptr){
         return __LINE__;
     }
@@ -178,7 +75,7 @@ int main(int argc, char* argv[]) {
         return __LINE__;
     }
 
-    const SDL::TTF::Font JPFont = SDL::TTF::OpenFont("/usr/share/fonts/opentype/ipafont-mincho/ipam.ttf", 18);
+    const Font JPFont = OpenFont("/usr/share/fonts/opentype/ipafont-mincho/ipam.ttf", 18);
     if(JPFont.get() == nullptr) {
         return __LINE__;
     }
@@ -197,7 +94,7 @@ int main(int argc, char* argv[]) {
 
     {
         constexpr char buttton_text[] = "hello world, こんにちは世界";
-        const auto text_area_size = SDL::TTF::UTF8TextSize(JPFont, buttton_text);
+        const auto text_area_size = UTF8TextSize(JPFont, buttton_text);
         if (!text_area_size.has_value()) {
             return __LINE__;
         }
@@ -215,7 +112,7 @@ int main(int argc, char* argv[]) {
     }
 
     using ctx_type = std::tuple<SampleArea &, bool &>;
-    using ButtonDown = SDL::EventFunctor<SDL_MOUSEBUTTONDOWN, decltype([](SDL_Event&& e, ctx_type&& ctx){
+    using ButtonDown = EventFunctor<SDL_MOUSEBUTTONDOWN, decltype([](SDL_Event&& e, ctx_type&& ctx){
             auto widget = std::get<SampleArea&>(ctx).under<int>({e.button.x, e.button.y});
             if(widget == std::get<SampleArea&>(ctx).end()){
                 return;
@@ -227,7 +124,7 @@ int main(int argc, char* argv[]) {
                 }
             }){}, *widget);
         })>;
-    using ButtonUp = SDL::EventFunctor<SDL_MOUSEBUTTONUP, decltype([](SDL_Event&& e, ctx_type&& ctx){
+    using ButtonUp = EventFunctor<SDL_MOUSEBUTTONUP, decltype([](SDL_Event&& e, ctx_type&& ctx){
             SampleArea& sampleArea = std::get<SampleArea&>(ctx);
             auto widget = sampleArea.under<int>({e.button.x, e.button.y});
             if(widget == sampleArea.end()){
@@ -240,7 +137,7 @@ int main(int argc, char* argv[]) {
                 }
             }){}, *widget);
         })>;
-    using KeyDown = SDL::EventFunctor<SDL_KEYDOWN, decltype([](SDL_Event&& e, ctx_type&& ctx){
+    using KeyDown = EventFunctor<SDL_KEYDOWN, decltype([](SDL_Event&& e, ctx_type&& ctx){
             if(e.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
                 std::get<bool&>(ctx) = false;
             }
@@ -248,7 +145,7 @@ int main(int argc, char* argv[]) {
 
     for(bool isRunning=true; isRunning;) {
         for (SDL_Event e; SDL_PollEvent(&e);) {
-            SDL::DispatchEvent<ctx_type,
+            DispatchEvent<ctx_type,
                 ButtonDown, ButtonUp, KeyDown
             >(std::forward<SDL_Event>(e), std::tie(sampleArea, isRunning));
         }
