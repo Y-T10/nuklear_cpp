@@ -1,4 +1,7 @@
 #include "fmt/core.h"
+#include <cstddef>
+#include <limits>
+#include <string>
 #define BOOST_SCOPE_EXIT_CONFIG_USE_LAMBDAS
 #include "boost/scope_exit.hpp"
 
@@ -48,6 +51,34 @@ void DrawButton(const render_context& ctx, const Button<T>& button) noexcept {
     );
     RenderSurface(renderer, text_image, drawRect.x + 5, drawRect.y + 5);
 };
+
+template <class coord_type>
+const Button<coord_type> CreateTextButton(const std::string& text, const point_t<coord_type>& min_corner, const coord_type text_width, const coord_type text_height) noexcept {
+    const int button_width = text_width + 10;
+    const int button_height = text_height + 10;
+    return {
+        .text = text,
+        .button_area = boundary_t<coord_type>{
+            min_corner,
+            point_t<coord_type>{
+                min_corner.x() + button_width,
+                min_corner.y() + button_height}
+            },
+        .is_pressed = false
+    };
+}
+
+template <class coord_type>
+void PlaceKeyboardButtons(WidgetArea2<coord_type, Button<coord_type>>& area) noexcept {
+    for(char c = ' '; c < std::numeric_limits<char>::max(); c++) {
+        const size_t idx = c - ' ';
+        const point_t<coord_type> min = {
+            50+100*(idx%15),50+100*(idx/15)
+        };
+        const char str[2] = {c, '\0'};
+        area.emplace_back(CreateTextButton(str, min, 50, 50));
+    }
+} 
 
 int main(int argc, char* argv[]) {
     fmt::println("sample program with fmt!");
@@ -110,6 +141,7 @@ int main(int argc, char* argv[]) {
             sampleArea.emplace_back(button);
         }
     }
+    PlaceKeyboardButtons(sampleArea);
 
     using ctx_type = std::tuple<SampleArea &, bool &>;
     using ButtonDown = EventFunctor<SDL_MOUSEBUTTONDOWN, decltype([](SDL_Event&& e, ctx_type&& ctx){
