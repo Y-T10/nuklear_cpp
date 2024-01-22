@@ -7,7 +7,9 @@ project(Nuklear-cpp
     DESCRIPTION "Personal cpp template repository."
 )
 
-set(CMAKE_BUILD_TYPE Debug)
+# ビルド設定
+set(CMAKE_BUILD_TYPE Release)
+set(BUILD_SHARED_LIBS OFF)
 
 # CMakeのポリシーを設定する
 cmake_policy(SET CMP0076 NEW)
@@ -56,9 +58,9 @@ target_include_directories(Atm INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(Atm INTERFACE Threads::Threads Boost::boost)
 
 if (${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
-    find_package(SDL2 REQUIRED)
+find_package(SDL2 REQUIRED)
     find_package(Fontconfig REQUIRED)
     # Add sub add_subdirectories
-    add_subdirectory(demo)
     add_subdirectory(SDL2Cpp)
+    add_subdirectory(demo)
 endif()
