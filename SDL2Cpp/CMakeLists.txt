@@ -1,5 +1,5 @@
 # 自作ライブラリSDL2Cppを定義
-add_library(SDL2Cpp STATIC)
+add_library(SDL2Cpp)
 
 target_sources(
     SDL2Cpp PRIVATE
