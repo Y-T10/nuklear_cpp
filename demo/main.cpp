@@ -177,7 +177,16 @@ int main(int argc, char* argv[]) {
         return __LINE__;
     }
 
-    const Font JPFont = OpenFont("/usr/share/fonts/opentype/ipafont-mincho/ipam.ttf", 18);
+    const auto font_path = FontconfigCpp::SearchFont(
+        FontconfigCpp::CurrentDefaultConfig(),
+        FontconfigCpp::CreatePattern({{FC_FAMILY, (const FcChar8*)"Latin Modern Math"}})
+    );
+
+    if(font_path.empty() || !std::filesystem::exists(font_path)) {
+        return __LINE__;
+    }
+
+    const Font JPFont = OpenFont(font_path.c_str(), 18);
     if(JPFont.get() == nullptr) {
         return __LINE__;
     }
