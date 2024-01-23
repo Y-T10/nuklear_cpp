@@ -53,6 +53,10 @@ namespace FontconfigCpp {
     }
 
     const std::filesystem::path SearchFont(const Config& conf, const Pattern& pattern) noexcept {
+        /// TODO: この処理は別関数に分けるのが良さそう?
+        FcConfigSubstitute(conf.get(), pattern.get(), FcMatchPattern);
+        FcDefaultSubstitute(pattern.get());
+
         const Pattern fontPattern = FontMatch(conf, pattern);
         if(!fontPattern.get()) {
             return "";
