@@ -204,24 +204,6 @@ int main(int argc, char* argv[]) {
         }
     };
 
-    {
-        constexpr char buttton_text[] = "hello world, こんにちは世界";
-        const auto text_area_size = UTF8TextSize(JPFont, buttton_text);
-        if (!text_area_size.has_value()) {
-            return __LINE__;
-        }
-        for(int i = 0; i < 20; ++i) {
-            const int button_width = text_area_size->first + 10;
-            const int button_height = text_area_size->second + 10;
-            const point_t<int> min_corner = point_t<int>{button_width,button_height + button_height * i};
-            const SampleButton button = {
-                .text = buttton_text,
-                .button_area = boundary_t<int>{min_corner, point_t<int>{min_corner.x() + button_width,min_corner.y() + button_height}},
-                .is_pressed = false
-            };
-            sampleArea.emplace_back(button);
-        }
-    }
     PlaceKeyboardButtons(sampleArea);
 
     using ctx_type = std::tuple<SampleArea &, bool &>;
