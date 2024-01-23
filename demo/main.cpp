@@ -47,8 +47,8 @@ namespace FontconfigCpp {
     template<class T>
     using Fc_ptr = boost::intrusive_ptr<T>;
 
-    using Config = boost::intrusive_ptr<FcConfig>;
-    using Pattern = Fc_ptr<FcPattern, FcPatternDestroy>;
+    using Config = Fc_ptr<FcConfig>;
+    using Pattern = Fc_ptr<FcPattern>;
 
     const Pattern FontMatch(const Config& conf, const Pattern& pattern) noexcept {
         FcResult result;
