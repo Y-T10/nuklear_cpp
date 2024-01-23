@@ -26,6 +26,7 @@
 
 #include "fontconfig/fontconfig.h"
 #include <filesystem>
+#include "boost/smart_ptr/intrusive_ptr.hpp"
 
 namespace FontconfigCpp {
     template<class T, void(*deleter)(T*)>
@@ -35,11 +36,18 @@ namespace FontconfigCpp {
         };
     };
 
+    void intrusive_ptr_add_ref(FcConfig *p) {
+        FcConfigReference(p);
+    }
+
+    void intrusive_ptr_release(FcConfig *p) {
+        FcConfigDestroy(p);
+    }
+
     template<class T, auto deleter>
     using Fc_ptr = std::unique_ptr<T, Fc_deleter<T, deleter>>;
 
-    /// TODO: これをintrusive_ptrで実装する
-    using Config = Fc_ptr<FcConfig, FcConfigDestroy>;
+    using Config = boost::intrusive_ptr<FcConfig>;
     using Pattern = Fc_ptr<FcPattern, FcPatternDestroy>;
 
     const Pattern FontMatch(const Config& conf, const Pattern& pattern) noexcept {
