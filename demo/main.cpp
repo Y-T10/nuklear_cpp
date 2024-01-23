@@ -28,6 +28,21 @@
 #include <filesystem>
 #include "boost/smart_ptr/intrusive_ptr.hpp"
 
+/// 以下の関数はすべて無名空間にあるのでここに置く
+
+void intrusive_ptr_add_ref(FcPattern *p) {
+    FcPatternReference(p);
+}
+void intrusive_ptr_release(FcPattern *p) {
+    FcPatternDestroy(p);
+}
+void intrusive_ptr_add_ref(FcConfig *p) {
+    FcConfigReference(p);
+}
+void intrusive_ptr_release(FcConfig *p) {
+    FcConfigDestroy(p);
+}
+
 namespace FontconfigCpp {
     template<class T, void(*deleter)(T*)>
     struct Fc_deleter {
@@ -35,22 +50,6 @@ namespace FontconfigCpp {
             deleter(ptr);
         };
     };
-
-    void intrusive_ptr_add_ref(FcConfig *p) {
-        FcConfigReference(p);
-    }
-
-    void intrusive_ptr_release(FcConfig *p) {
-        FcConfigDestroy(p);
-    }
-
-    void intrusive_ptr_add_ref(FcPattern *p) {
-        FcPatternReference(p);
-    }
-
-    void intrusive_ptr_release(FcPattern *p) {
-        FcPatternDestroy(p);
-    }
 
     template<class T>
     using Fc_ptr = boost::intrusive_ptr<T>;
