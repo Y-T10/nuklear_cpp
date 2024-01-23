@@ -23,6 +23,24 @@
 #include "AtmButton.hpp"
 #include "AtmTypes.hpp"
 
+#include "fontconfig/fontconfig.h"
+
+namespace FontconfigCpp {
+    template<class T, void(*deleter)(T*)>
+    struct Fc_deleter {
+        void operator()(T* ptr) {
+            deleter(ptr);
+        };
+    };
+
+    template<class T, auto deleter>
+    using Fc_ptr = std::unique_ptr<T, Fc_deleter<T, deleter>>;
+
+    using Config = Fc_ptr<FcConfig, FcConfigDestroy>;
+    using Pattern = Fc_ptr<FcPattern, FcPatternDestroy>;
+
+}
+
 template <class T>
 const SDL_Rect Boundary2Rect(const boundary_t<T>& box) noexcept {
     return SDL_Rect{
