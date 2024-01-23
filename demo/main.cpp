@@ -24,6 +24,7 @@
 #include "AtmTypes.hpp"
 
 #include "fontconfig/fontconfig.h"
+#include <filesystem>
 
 namespace FontconfigCpp {
     template<class T, void(*deleter)(T*)>
@@ -39,6 +40,28 @@ namespace FontconfigCpp {
     using Config = Fc_ptr<FcConfig, FcConfigDestroy>;
     using Pattern = Fc_ptr<FcPattern, FcPatternDestroy>;
 
+    const Pattern FontMatch(const Config& conf, const Pattern& pattern) noexcept {
+        FcResult result;
+        Pattern fontPattern = Pattern(FcFontMatch(conf.get(), pattern.get(), &result));
+        if(fontPattern.get() == nullptr) {
+            return nullptr;
+        }
+        if(result != FcResult::FcResultMatch) {
+            return nullptr;
+        }
+        return fontPattern;
+    }
+
+    const std::filesystem::path SearchFont(const Config& conf, const Pattern& pattern) noexcept {
+        const Pattern fontPattern = FontMatch(conf, pattern);
+        if(!fontPattern.get()) {
+            return "";
+        }
+
+        FcChar8* filePaht;
+	    FcPatternGetString(fontPattern.get(), FC_FILE, 0, &filePaht);
+        return std::filesystem::path((char*)filePaht);
+    };
 }
 
 template <class T>
