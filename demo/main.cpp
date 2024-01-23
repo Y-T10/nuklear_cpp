@@ -66,6 +66,10 @@ namespace FontconfigCpp {
 	    FcPatternGetString(fontPattern.get(), FC_FILE, 0, &filePaht);
         return std::filesystem::path((char*)filePaht);
     };
+
+    const Config CurrentDefaultConfig() noexcept {
+        return Config(FcConfigGetCurrent());
+    }
 }
 
 template <class T>
