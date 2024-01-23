@@ -13,6 +13,7 @@
 #include "boost/geometry/algorithms/disjoint.hpp"
 #include "AtmTypes.hpp"
 
+/// TODO: ウィジェト内の座標と外の座標の変換を扱う
 template<class coord_type, Widget2<coord_type> ...widgets>
 struct WidgetArea2 {
     using widget_type = std::variant<widgets...>;
