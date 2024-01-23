@@ -1,6 +1,7 @@
 #include "fmt/core.h"
 #include <cstddef>
 #include <limits>
+#include <map>
 #include <string>
 #define BOOST_SCOPE_EXIT_CONFIG_USE_LAMBDAS
 #include "boost/scope_exit.hpp"
@@ -69,6 +70,24 @@ namespace FontconfigCpp {
 
     const Config CurrentDefaultConfig() noexcept {
         return Config(FcConfigGetCurrent());
+    }
+
+    const Pattern CreatePattern(const std::map<std::string, std::basic_string<FcChar8>>& param) noexcept {
+        Pattern pattern = Pattern(FcPatternCreate());
+        if(pattern.get() == nullptr) {
+            return nullptr;
+        }
+
+        if(param.empty()) {
+            return pattern;
+        }
+
+        for(const auto& p: param) {
+            if(!FcPatternAddString(pattern.get(), p.first.c_str(), p.second.c_str())) {
+                return nullptr;
+            }
+        }
+        return pattern;
     }
 }
 
