@@ -11,6 +11,8 @@
 #include "SDLCpp.hpp"
 #include "SDLCpp_ttf.hpp"
 
+#include "Fcpp.hpp"
+
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_video.h"
 #include "SDL2/SDL_render.h"
@@ -26,98 +28,6 @@
 #include "AtmButton.hpp"
 #include "AtmTypes.hpp"
 
-#include "fontconfig/fontconfig.h"
-#include <filesystem>
-#include "boost/smart_ptr/intrusive_ptr.hpp"
-
-/// 以下の関数はすべて無名空間にあるのでここに置く
-
-void intrusive_ptr_add_ref(FcPattern *p) {
-    FcPatternReference(p);
-}
-void intrusive_ptr_release(FcPattern *p) {
-    FcPatternDestroy(p);
-}
-void intrusive_ptr_add_ref(FcConfig *p) {
-    FcConfigReference(p);
-}
-void intrusive_ptr_release(FcConfig *p) {
-    FcConfigDestroy(p);
-}
-
-namespace FontconfigCpp {
-    template<class T, void(*deleter)(T*)>
-    struct Fc_deleter {
-        void operator()(T* ptr) {
-            deleter(ptr);
-        };
-    };
-
-    template<class T>
-    using Fc_ptr = boost::intrusive_ptr<T>;
-
-    using Config = Fc_ptr<FcConfig>;
-    using Pattern = Fc_ptr<FcPattern>;
-
-    template<auto Func, class ...Args>
-    auto CreateFcPtr(Args ...args) noexcept {
-        static_assert(std::is_invocable_v<decltype(Func), Args...>);
-        using return_type = std::invoke_result_t<decltype(Func), Args...>;
-        static_assert(std::is_pointer_v<return_type>);
-        using return_type_raw = std::remove_pointer_t<return_type>;
-        return Fc_ptr<return_type_raw>(Func(args...), false);
-    }
-
-    const Pattern FontMatch(const Config& conf, const Pattern& pattern) noexcept {
-        FcResult result;
-        Pattern fontPattern = CreateFcPtr<FcFontMatch>(conf.get(), pattern.get(), &result);
-        if(fontPattern.get() == nullptr) {
-            return nullptr;
-        }
-        if(result != FcResult::FcResultMatch) {
-            return nullptr;
-        }
-        return fontPattern;
-    }
-
-    const std::filesystem::path SearchFont(const Config& conf, const Pattern& pattern) noexcept {
-        /// TODO: この処理は別関数に分けるのが良さそう?
-        FcConfigSubstitute(conf.get(), pattern.get(), FcMatchPattern);
-        FcDefaultSubstitute(pattern.get());
-
-        const Pattern fontPattern = FontMatch(conf, pattern);
-        if(!fontPattern.get()) {
-            return "";
-        }
-
-        FcChar8* filePaht;
-	    FcPatternGetString(fontPattern.get(), FC_FILE, 0, &filePaht);
-        return std::filesystem::path((char*)filePaht);
-    };
-
-    const Config CurrentDefaultConfig() noexcept {
-        return Config(FcConfigGetCurrent());
-    }
-
-    const Pattern CreatePattern(const std::map<std::string, std::basic_string<FcChar8>>& param) noexcept {
-        Pattern pattern = CreateFcPtr<FcPatternCreate>();
-        if(pattern.get() == nullptr) {
-            return nullptr;
-        }
-
-        if(param.empty()) {
-            return pattern;
-        }
-
-        for(const auto& p: param) {
-            if(!FcPatternAddString(pattern.get(), p.first.c_str(), p.second.c_str())) {
-                return nullptr;
-            }
-        }
-        return pattern;
-    }
-}
-
 template <class T>
 const SDL_Rect Boundary2Rect(const boundary_t<T>& box) noexcept {
     return SDL_Rect{
@@ -129,6 +39,7 @@ const SDL_Rect Boundary2Rect(const boundary_t<T>& box) noexcept {
 
 using namespace SDL2Cpp;
 using namespace SDL2Cpp::TTF;
+using namespace Fcpp;
 
 using render_context = std::tuple<const Renderer&, const Font&>;
 
@@ -204,9 +115,9 @@ int main(int argc, char* argv[]) {
         return __LINE__;
     }
 
-    const auto font_path = FontconfigCpp::SearchFont(
-        FontconfigCpp::CurrentDefaultConfig(),
-        FontconfigCpp::CreatePattern({{FC_FAMILY, (const FcChar8*)"Latin Modern Math"}})
+    const auto font_path = SearchFont(
+        CurrentDefaultConfig(),
+        CreatePattern({{FC_FAMILY, (const FcChar8*)"Latin Modern Math"}})
     );
 
     if(font_path.empty() || !std::filesystem::exists(font_path)) {
