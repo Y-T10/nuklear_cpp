@@ -38,6 +38,7 @@ namespace FontconfigCpp {
     template<class T, auto deleter>
     using Fc_ptr = std::unique_ptr<T, Fc_deleter<T, deleter>>;
 
+    /// TODO: これをintrusive_ptrで実装する
     using Config = Fc_ptr<FcConfig, FcConfigDestroy>;
     using Pattern = Fc_ptr<FcPattern, FcPatternDestroy>;
 
