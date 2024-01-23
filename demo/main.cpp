@@ -44,6 +44,14 @@ namespace FontconfigCpp {
         FcConfigDestroy(p);
     }
 
+    void intrusive_ptr_add_ref(FcPattern *p) {
+        FcPatternReference(p);
+    }
+
+    void intrusive_ptr_release(FcPattern *p) {
+        FcPatternDestroy(p);
+    }
+
     template<class T>
     using Fc_ptr = boost::intrusive_ptr<T>;
 
