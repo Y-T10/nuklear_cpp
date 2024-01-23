@@ -44,8 +44,8 @@ namespace FontconfigCpp {
         FcConfigDestroy(p);
     }
 
-    template<class T, auto deleter>
-    using Fc_ptr = std::unique_ptr<T, Fc_deleter<T, deleter>>;
+    template<class T>
+    using Fc_ptr = boost::intrusive_ptr<T>;
 
     using Config = boost::intrusive_ptr<FcConfig>;
     using Pattern = Fc_ptr<FcPattern, FcPatternDestroy>;
