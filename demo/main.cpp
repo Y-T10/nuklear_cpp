@@ -153,8 +153,11 @@ int main(int argc, char* argv[]) {
 
     SDL_Init(SDL_INIT_EVERYTHING);
     TTF_Init();
+    FcInit();
+    FcInitLoadConfigAndFonts();
 
     BOOST_SCOPE_EXIT_ALL(){
+        FcFini();
         TTF_Quit();
         SDL_Quit();
     };
