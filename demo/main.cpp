@@ -3,6 +3,8 @@
 #include <limits>
 #include <map>
 #include <string>
+#include <type_traits>
+#include <utility>
 #define BOOST_SCOPE_EXIT_CONFIG_USE_LAMBDAS
 #include "boost/scope_exit.hpp"
 
@@ -68,7 +70,7 @@ namespace FontconfigCpp {
 
     const Pattern FontMatch(const Config& conf, const Pattern& pattern) noexcept {
         FcResult result;
-        Pattern fontPattern = Pattern(FcFontMatch(conf.get(), pattern.get(), &result));
+        Pattern fontPattern = CreateFcPtr<FcFontMatch>(conf.get(), pattern.get(), &result);
         if(fontPattern.get() == nullptr) {
             return nullptr;
         }
@@ -98,7 +100,7 @@ namespace FontconfigCpp {
     }
 
     const Pattern CreatePattern(const std::map<std::string, std::basic_string<FcChar8>>& param) noexcept {
-        Pattern pattern = Pattern(FcPatternCreate());
+        Pattern pattern = CreateFcPtr<FcPatternCreate>();
         if(pattern.get() == nullptr) {
             return nullptr;
         }
