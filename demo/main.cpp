@@ -58,6 +58,15 @@ namespace FontconfigCpp {
     using Config = Fc_ptr<FcConfig>;
     using Pattern = Fc_ptr<FcPattern>;
 
+    template<auto Func, class ...Args>
+    auto CreateFcPtr(Args ...args) noexcept {
+        static_assert(std::is_invocable_v<decltype(Func), Args...>);
+        using return_type = std::invoke_result_t<decltype(Func), Args...>;
+        static_assert(std::is_pointer_v<return_type>);
+        using return_type_raw = std::remove_pointer_t<return_type>;
+        return Fc_ptr<return_type_raw>(Func(args...), false);
+    }
+
     const Pattern FontMatch(const Config& conf, const Pattern& pattern) noexcept {
         FcResult result;
         Pattern fontPattern = Pattern(FcFontMatch(conf.get(), pattern.get(), &result));
