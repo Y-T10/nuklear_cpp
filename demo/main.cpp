@@ -163,11 +163,35 @@ int main(int argc, char* argv[]) {
                 std::get<bool&>(ctx) = false;
             }
         })>;
+    using MouseMove = EventFunctor<SDL_MOUSEMOTION, decltype([](SDL_Event&& e, ctx_type&& ctx){
+        if(!(e.motion.state & SDL_BUTTON_LMASK)) {
+            return;
+        }
+        SampleArea& sampleArea = std::get<SampleArea&>(ctx);
+        using namespace boost::geometry;
+        const model::segment<point_t<int>> mouse_move = {
+            {e.motion.x - e.motion.xrel, e.motion.y - e.motion.yrel},
+            {e.motion.x, e.motion.y}
+        };
+        for (auto& ui : sampleArea) {
+            const auto area = std::visit([](const auto& w){
+                return w.boundary_area();
+            }, ui);
+            if(!disjoint(area, mouse_move)) {
+                std::visit(decltype([]<class T>(T& w) {
+                    if constexpr (std::is_same_v<T, SampleButton>) {
+                        w.push();
+                        return;
+                    }
+                }){}, ui);
+            }
+        }
+    })>;
 
     for(bool isRunning=true; isRunning;) {
         for (SDL_Event e; SDL_PollEvent(&e);) {
             DispatchEvent<ctx_type,
-                ButtonDown, ButtonUp, KeyDown
+                ButtonDown, ButtonUp, KeyDown, MouseMove
             >(std::forward<SDL_Event>(e), std::tie(sampleArea, isRunning));
         }
 
