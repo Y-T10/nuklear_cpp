@@ -44,9 +44,6 @@ add_library(Nuklear INTERFACE)
 # Nuklearのヘッダファイルがあるディレクトリを設定する、
 target_include_directories(Nuklear INTERFACE "${Nuklear_SOURCE_DIR}")
 
-# CPMを有効にする
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM.cmake)
-
 # システム内のパッケージを読み込む
 find_package(Threads REQUIRED)
 #find_package(Boost REQUIRED)
