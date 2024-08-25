@@ -26,17 +26,23 @@ set(CMAKE_BUILD_TYPE Release)
 # clangd向けの設定ファイルを生成させる
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-# CPMを有効にする
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM.cmake)
-# Nuklearを読み込む
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Nuklear.cmake)
+# 外部ソース読み込み
+include(FetchContent)
 
-# CPMを用いてネット上のパッケージを取り込む
-CPMAddPackage(
-    NAME fmt
-    GITHUB_REPOSITORY fmtlib/fmt
-    GIT_TAG 10.2.1
+## Nuklear
+# nuklearのリポジトリをダウンロードする
+FetchContent_Declare(
+  Nuklear
+  GIT_REPOSITORY https://github.com/Immediate-Mode-UI/Nuklear.git
+  GIT_TAG be0a3f6
 )
+
+# nuklearの情報を集める
+FetchContent_MakeAvailable(Nuklear)
+# Nuklearのターゲットを定義する
+add_library(Nuklear INTERFACE)
+# Nuklearのヘッダファイルがあるディレクトリを設定する、
+target_include_directories(Nuklear INTERFACE "${Nuklear_SOURCE_DIR}")
 
 # システム内のパッケージを読み込む
 find_package(Threads REQUIRED)
@@ -52,7 +58,7 @@ target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/nuklear-i
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # プログラムが利用するターゲットを追加
-target_link_libraries(${PROJECT_NAME} PUBLIC nuklear-header)
+target_link_libraries(${PROJECT_NAME} PUBLIC Nuklear)
 
 if (${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
     find_package(SDL2 REQUIRED)
