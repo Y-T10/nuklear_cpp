@@ -42,7 +42,7 @@ FetchContent_MakeAvailable(Nuklear)
 # Nuklearのターゲットを定義する
 add_library(Nuklear INTERFACE)
 # Nuklearのヘッダファイルがあるディレクトリを設定する、
-target_include_directories(Nuklear INTERFACE "${Nuklear_SOURCE_DIR}")
+target_include_directories(Nuklear INTERFACE "${nuklear_SOURCE_DIR}")
 
 # システム内のパッケージを読み込む
 find_package(Threads REQUIRED)
