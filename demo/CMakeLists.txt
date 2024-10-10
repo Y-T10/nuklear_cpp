@@ -28,12 +28,11 @@ set_target_properties(original_demo PROPERTIES
 # ソースファイルを追加
 target_sources(original_demo PRIVATE main_origin.cpp)
 # ヘッダファイルのディレクトリを追加
-target_include_directories(original_demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(original_demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} "${nuklear_SOURCE_DIR}")
 
 # プログラムが利用するターゲットを追加
 target_link_libraries(
     original_demo PRIVATE
-    Nuklear-cpp::Nuklear-cpp
     $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
     $<IF:$<BOOL:${BUILD_SHARED_LIBS}>,SDL2::SDL2,SDL2::SDL2-static>
 )
